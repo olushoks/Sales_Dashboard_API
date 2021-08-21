@@ -14,7 +14,7 @@ router.post("/create", async (req, res) => {
     }
 
     // create username
-    const userName = await generateUsername(firstName, lastName, "");
+    const username = await generateUsername(firstName, lastName, "");
 
     // generate temp password
     const tempPass = generateTempPassword(4);
@@ -22,7 +22,7 @@ router.post("/create", async (req, res) => {
     const tempProfile = await TempProfile.create({
       firstName,
       lastName,
-      userName,
+      username,
       tempPass,
     });
 

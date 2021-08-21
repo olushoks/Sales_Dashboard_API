@@ -14,7 +14,7 @@ const tempProfileSchema = new Schema({
     trim: true,
     lowercase: true,
   },
-  userName: {
+  username: {
     type: String,
     trim: true,
     lowercase: true,

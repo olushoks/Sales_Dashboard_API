@@ -6,11 +6,10 @@ const generateUsername = async (firstN, lastN, modifier) => {
   modifier = Number(modifier + 1);
 
   // check if it already exists in DB
-  let usernameInDB = await TempProfile.findOne({ userName });
+  let usernameInDB = await TempProfile.findOne({ username });
 
   // If no, return
   if (usernameInDB === null) {
-    console.log(username);
     return username;
   }
 

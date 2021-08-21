@@ -22,7 +22,7 @@ const tempProfileSchema = new Schema({
     required: true,
     minLength: 2,
   },
-  tempPass: {
+  password: {
     type: String,
     minLength: 6,
   },

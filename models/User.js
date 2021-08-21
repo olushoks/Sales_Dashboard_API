@@ -30,13 +30,12 @@ const UserSchema = new Schema({
     {
       question: {
         type: String,
-        minLength: 20,
-        maxlength: 20,
+        minLength: 10,
+        maxlength: 100,
         required: [true, "please enter a security question"],
       },
       answer: {
         type: String,
-        minLength: 20,
         maxlength: 20,
         required: [true, "please enter a security question"],
       },

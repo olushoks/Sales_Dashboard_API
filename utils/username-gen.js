@@ -1,7 +1,7 @@
 const TempProfile = require("../models/Temp-profile");
 
 const generateUsername = async (firstN, lastN, modifier) => {
-  let userName = `${firstN[0].toLowerCase()}${lastN.toLowerCase()}${modifier}`;
+  let username = `${firstN[0].toLowerCase()}${lastN.toLowerCase()}${modifier}`;
 
   modifier = Number(modifier + 1);
 
@@ -10,8 +10,8 @@ const generateUsername = async (firstN, lastN, modifier) => {
 
   // If no, return
   if (usernameInDB === null) {
-    console.log(userName);
-    return userName;
+    console.log(username);
+    return username;
   }
 
   // If yes, generate another

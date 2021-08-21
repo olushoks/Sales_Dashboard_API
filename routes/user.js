@@ -32,4 +32,19 @@ router.post("/create", async (req, res) => {
   }
 });
 
+router.post("/", async (req, res) => {
+  try {
+    const { userName } = req.body;
+    let user = await TempProfile.findOne({ userName });
+
+    if (user) {
+      return res
+        .status(200)
+        .json({ sucess: true, msg: "Kindly Complete your account set up!" });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, msg: error.message });
+  }
+});
+
 module.exports = router;

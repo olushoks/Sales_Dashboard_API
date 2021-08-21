@@ -19,6 +19,7 @@ const tempProfileSchema = new Schema({
     trim: true,
     lowercase: true,
     unique: true,
+    required: true,
     minLength: 2,
   },
   tempPass: {
@@ -27,4 +28,4 @@ const tempProfileSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model("TempProfile", tempProfileSchema);
+module.exports = mongoose.model("Temp_Profile", tempProfileSchema);

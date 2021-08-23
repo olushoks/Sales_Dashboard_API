@@ -4,7 +4,7 @@ const TempProfile = require("../models/Temp-profile");
 const User = require("../models/User");
 const { generateUsername } = require("../utils/username-gen");
 const { generateTempPassword } = require("../utils/password-gen");
-const { hashPassword } = require("../helper/bcrypt");
+const { hashPassword, comparePassword } = require("../helper/bcrypt");
 
 router.post("/create", async (req, res) => {
   try {
@@ -49,6 +49,24 @@ router.post("/", async (req, res) => {
         .status(200)
         .json({ sucess: true, msg: "Kindly Complete your account set up!" });
     }
+
+    user = await User.findOne({ username });
+
+    if (!user) {
+      return res
+        .status(403)
+        .json({ success: false, msg: "Invald username or password-FOUND" });
+    }
+
+    const isPasswordValid = await comparePassword(password, user.password);
+
+    if (!isPasswordValid) {
+      return res
+        .status(403)
+        .json({ success: false, msg: "Invald username or password" });
+    }
+
+    res.status(200).json({ success: true, msg: "successfully logged in" });
   } catch (error) {
     res.status(500).json({ success: false, msg: error.message });
   }

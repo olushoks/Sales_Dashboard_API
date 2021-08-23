@@ -12,6 +12,16 @@ const hashPassword = (password) => {
   });
 };
 
+const comparePassword = (password, passwordFromDB) => {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(password, passwordFromDB, (err, res) => {
+      if (err) reject(err);
+      resolve(res);
+    });
+  });
+};
+
 module.exports = {
   hashPassword,
+  comparePassword,
 };

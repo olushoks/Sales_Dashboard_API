@@ -5,6 +5,7 @@ const User = require("../models/User");
 const { generateUsername } = require("../utils/username-gen");
 const { generateTempPassword } = require("../utils/password-gen");
 const { hashPassword, comparePassword } = require("../helper/bcrypt");
+const { createAccessJWT, createRefreshJWT } = require("../helper/jwt");
 
 router.post("/create", async (req, res) => {
   try {
@@ -66,7 +67,18 @@ router.post("/", async (req, res) => {
         .json({ success: false, msg: "Invald username or password" });
     }
 
-    res.status(200).json({ success: true, msg: "successfully logged in" });
+    // generate access and refresh token
+    const accessToken = await createAccessJWT(user._id);
+    const refreshToken = await createRefreshJWT(user._id);
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        msg: "successfully logged in",
+        accessToken,
+        refreshToken,
+      });
   } catch (error) {
     res.status(500).json({ success: false, msg: error.message });
   }

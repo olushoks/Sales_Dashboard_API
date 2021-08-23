@@ -6,35 +6,39 @@ const { generateUsername } = require("../utils/username-gen");
 const { generateTempPassword } = require("../utils/password-gen");
 const { hashPassword, comparePassword } = require("../helper/bcrypt");
 const { createAccessJWT, createRefreshJWT } = require("../helper/jwt");
+const { createTempUserProfile } = require("../controllers/user");
 
-router.post("/create", async (req, res) => {
-  try {
-    let { accessCode, firstName, lastName } = req.body;
+// create user temporary profile
+router.post("/create", createTempUserProfile);
+// router.post("/create", async (req, res) => {
+//   try {
+//     let { accessCode, firstName, lastName } = req.body;
 
-    // check if user has valid access code
-    if (String(accessCode) !== process.env.SUPER_USER_ACCESS_CODE) {
-      return res.status(403).json({ success: false, msg: "Unauthorized" });
-    }
+//     // check if user has valid access code
+//     if (String(accessCode) !== process.env.SUPER_USER_ACCESS_CODE) {
+//       return res.status(403).json({ success: false, msg: "Unauthorized" });
+//     }
 
-    // create username
-    const username = await generateUsername(firstName, lastName, "");
+//     // create username
+//     const username = await generateUsername(firstName, lastName, "");
+//     // generate temp password
+//     const password = generateTempPassword(4);
 
-    // generate temp password
-    const password = generateTempPassword(4);
+//     // create temp profile document
+//     const tempProfile = await TempProfile.create({
+//       firstName,
+//       lastName,
+//       username,
+//       password,
+//     });
 
-    const tempProfile = await TempProfile.create({
-      firstName,
-      lastName,
-      username,
-      password,
-    });
+//     res.status(200).json({ success: true, msg: "success", tempProfile });
+//   } catch (error) {
+//     res.status(500).json({ success: false, msg: error });
+//   }
+// });
 
-    res.status(200).json({ success: true, msg: "success", tempProfile });
-  } catch (error) {
-    res.status(500).json({ success: false, msg: error });
-  }
-});
-
+// log in
 router.post("/", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -71,19 +75,18 @@ router.post("/", async (req, res) => {
     const accessToken = await createAccessJWT(user._id);
     const refreshToken = await createRefreshJWT(user._id);
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        msg: "successfully logged in",
-        accessToken,
-        refreshToken,
-      });
+    res.status(200).json({
+      success: true,
+      msg: "successfully logged in",
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     res.status(500).json({ success: false, msg: error.message });
   }
 });
 
+// initial account set up
 router.post("/setup/:userID", async (req, res) => {
   try {
     const { userID } = req.params;

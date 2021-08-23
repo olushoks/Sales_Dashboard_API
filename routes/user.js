@@ -4,7 +4,7 @@ const TempProfile = require("../models/Temp-profile");
 const User = require("../models/User");
 const { generateUsername } = require("../utils/username-gen");
 const { generateTempPassword } = require("../utils/password-gen");
-const { findByIdAndDelete } = require("../models/Temp-profile");
+const { hashPassword } = require("../helper/bcrypt");
 
 router.post("/create", async (req, res) => {
   try {
@@ -38,7 +38,6 @@ router.post("/", async (req, res) => {
   try {
     const { username, password } = req.body;
     let user = await TempProfile.findOne({ username });
-    console.log(user.password);
 
     if (user) {
       if (user.password !== password) {
@@ -66,11 +65,19 @@ router.post("/setup/:userID", async (req, res) => {
       password: tempPass,
     } = await TempProfile.findById(userID);
 
-    const { oldPassword, password: newPassword, securityQuestions } = req.body;
+    const {
+      oldPassword,
+      password: plainPassword,
+      securityQuestions,
+    } = req.body;
 
+    // check if temp pass matches pass from request
     if (tempPass !== oldPassword) {
       return res.status(400).json({ success: false, msg: "Invalid password" });
     }
+
+    // hash password
+    const newPassword = await hashPassword(plainPassword);
 
     const userProfile = await User.create({
       firstName,
@@ -80,6 +87,7 @@ router.post("/setup/:userID", async (req, res) => {
       securityQuestions,
     });
 
+    // delete user from temp profile collection
     await TempProfile.findByIdAndDelete(userID);
 
     res.status(200).json(userProfile);

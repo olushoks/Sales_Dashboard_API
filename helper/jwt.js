@@ -70,6 +70,8 @@ const verifyRefreshToken = (token) => {
   });
 };
 
+// store refresh token in specific user document
+
 module.exports = {
   createAccessJWT,
   createRefreshJWT,

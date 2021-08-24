@@ -29,7 +29,11 @@ const createTempUserProfile = async (req, res) => {
       password,
     });
 
-    res.status(200).json({ success: true, msg: "success", tempProfile });
+    res.status(200).json({
+      success: true,
+      msg: "success",
+      res: { username: tempProfile.username, password: tempProfile.password },
+    });
   } catch (error) {
     res.status(500).json({ success: false, msg: error });
   }
@@ -44,19 +48,21 @@ const userLogin = async (req, res) => {
     if (user) {
       if (user.password !== password) {
         return res
-          .status(403)
+          .status(400)
           .json({ success: false, msg: "Invald username or password" });
       }
-      return res
-        .status(200)
-        .json({ sucess: true, msg: "Kindly Complete your account set up!" });
+      return res.status(200).json({
+        sucess: true,
+        msg: "Kindly Complete your account set up!",
+        _id: user._id,
+      });
     }
 
     user = await User.findOne({ username });
 
     if (!user) {
       return res
-        .status(403)
+        .status(400)
         .json({ success: false, msg: "Invald username or password-FOUND" });
     }
 
@@ -64,13 +70,25 @@ const userLogin = async (req, res) => {
 
     if (!isPasswordValid) {
       return res
-        .status(403)
+        .status(400)
         .json({ success: false, msg: "Invald username or password" });
     }
 
     // generate access and refresh token
     const accessToken = await createAccessJWT(user._id);
     const refreshToken = await createRefreshJWT(user._id);
+
+    // store refesh token in specific user document
+    await User.findOneUpdate(
+      { _id: user._id },
+      {
+        $set: {
+          "refreshJWT.token": refreshToken,
+          "refreshJWT.issuedAt": Date.now(),
+        },
+      },
+      { new: true }
+    );
 
     res.status(200).json({
       success: true,
@@ -109,7 +127,7 @@ const accountSetUp = async (req, res) => {
     // hash password
     const newPassword = await hashPassword(plainPassword);
 
-    const userProfile = await User.create({
+    await User.create({
       firstName,
       lastName,
       username,
@@ -120,7 +138,26 @@ const accountSetUp = async (req, res) => {
     // delete user from temp profile collection
     await TempProfile.findByIdAndDelete(userID);
 
-    res.status(200).json(userProfile);
+    // generate access and refresh token
+    const accessToken = await createAccessJWT(userID);
+    const refreshToken = await createRefreshJWT(userID);
+
+    await User.findOneAndUpdate(
+      { username },
+      {
+        $set: {
+          "refreshJWT.token": refreshToken,
+          "refreshJWT.issuedAt": Date.now(),
+        },
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      msg: "Account set up has been complete. You are now been logged in",
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     res.status(500).json({ success: false, msg: error.message });
   }

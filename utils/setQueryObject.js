@@ -15,7 +15,7 @@ const setQueryObject = ({
   }
 
   if (age) {
-    queryObject["customer.age"] = +age;
+    queryObject["customer.age"] = JSON.parse(age);
   }
 
   if (email) {

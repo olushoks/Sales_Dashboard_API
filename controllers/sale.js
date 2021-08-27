@@ -30,6 +30,8 @@ const querySalesDB = async (req, res) => {
     satisfaction,
   });
 
+  console.log(queryObject);
+
   const sale = await Sale.find(queryObject)
     .limit(+limit)
     .select(fieldsToSelect);

@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Sale = require("../models/Sale");
+const setFieldsToSelect = require("../utils/setFieldsToSelect");
+const setQueryObject = require("../utils/setQueryObject");
 
 // get sales to a sppecific user
 router.get("/", async (req, res) => {
@@ -17,48 +19,23 @@ router.get("/", async (req, res) => {
   } = req.query;
 
   // get fields user wants to return from search
-  let selectOptions = select || "";
-  selectOptions = selectOptions.split("-");
-  selectOptions = selectOptions.join(" ");
-
+  let fieldsToSelect = setFieldsToSelect(select);
   // get fields user wants to query
-  const queryObject = {};
-
-  if (gender) {
-    queryObject["customer.gender"] = gender;
-  }
-
-  if (age) {
-    queryObject["customer.age"] = +age;
-  }
-
-  if (email) {
-    queryObject["customer.email"] = email;
-  }
-  if (satisfaction) {
-    queryObject["customer.satisfaction"] = satisfaction;
-  }
-
-  if (saleDate) {
-    queryObject.saleDate = saleDate;
-  }
-
-  if (storeLocation) {
-    queryObject.storeLocation = storeLocation;
-  }
-
-  if (couponUsed) {
-    queryObject.couponUsed = couponUsed;
-  }
-
-  if (purchaseMethod) {
-    queryObject.purchaseMethod = purchaseMethod;
-  }
+  let queryObject = setQueryObject({
+    saleDate,
+    storeLocation,
+    couponUsed,
+    purchaseMethod,
+    gender,
+    age,
+    email,
+    satisfaction,
+  });
 
   console.log(queryObject);
-  console.log(selectOptions);
+  console.log(fieldsToSelect);
 
-  const sale = await Sale.find(queryObject).limit(5).select(selectOptions);
+  const sale = await Sale.find(queryObject).limit(5).select(fieldsToSelect);
   res.status(200).json({ sale, count: sale.length });
 });
 

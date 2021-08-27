@@ -13,8 +13,15 @@ router.get("/", async (req, res) => {
     age,
     email,
     satisfaction,
+    select,
   } = req.query;
 
+  // get fields user wants to return from search
+  let selectOptions = select || "";
+  selectOptions = selectOptions.split("-");
+  selectOptions = selectOptions.join(" ");
+
+  // get fields user wants to query
   const queryObject = {};
 
   if (gender) {
@@ -49,12 +56,9 @@ router.get("/", async (req, res) => {
   }
 
   console.log(queryObject);
-
-  let selectOptions = Object.keys(queryObject);
-  selectOptions = selectOptions.join(" ");
   console.log(selectOptions);
 
-  const sale = await Sale.find(queryObject).limit(2).select(selectOptions);
+  const sale = await Sale.find(queryObject).limit(5).select(selectOptions);
   res.status(200).json({ sale, count: sale.length });
 });
 

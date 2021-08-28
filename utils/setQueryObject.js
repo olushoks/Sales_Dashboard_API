@@ -1,3 +1,5 @@
+const convertStrToArr = require("./strToArray");
+
 const setQueryObject = ({
   saleDate,
   storeLocation,
@@ -22,7 +24,7 @@ const setQueryObject = ({
     queryObject["customer.email"] = email;
   }
   if (satisfaction) {
-    queryObject["customer.satisfaction"] = +satisfaction;
+    queryObject["customer.satisfaction"] = JSON.parse(satisfaction);
   }
 
   if (saleDate) {
@@ -30,7 +32,7 @@ const setQueryObject = ({
   }
 
   if (storeLocation) {
-    queryObject.storeLocation = storeLocation;
+    queryObject.storeLocation = convertStrToArr(storeLocation);
   }
 
   if (couponUsed) {
@@ -38,7 +40,7 @@ const setQueryObject = ({
   }
 
   if (purchaseMethod) {
-    queryObject.purchaseMethod = purchaseMethod;
+    queryObject.purchaseMethod = convertStrToArr(purchaseMethod);
   }
 
   return queryObject;
